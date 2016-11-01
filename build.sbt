@@ -1,11 +1,9 @@
 val baseSettings = Seq(
   organization := "com.lihaoyi",
   name := "fansi",
-  version := "0.2.3",
-
+  version := "0.2.3-scastie",
   scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-RC2"),
-  
+  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0"),
   scmInfo := Some(ScmInfo(
     browseUrl = url("https://github.com/lihaoyi/utest"),
     connection = "scm:git:git@github.com:lihaoyi/utest.git"
@@ -21,7 +19,7 @@ val baseSettings = Seq(
 
 baseSettings
 
-lazy val fansi = crossProject
+lazy val fansi = crossProject2
   .settings(baseSettings)
   .settings(
     scalacOptions ++= Seq(scalaBinaryVersion.value match {
@@ -29,8 +27,8 @@ lazy val fansi = crossProject
       case _ => "-target:jvm-1.7"
     }),
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %%% "sourcecode" % "0.2.0",
-      "com.lihaoyi" %%% "utest" % "0.4.4" % "test"
+      "com.lihaoyi" %%% "sourcecode" % "0.2.0-native",
+      "com.lihaoyi" %%% "utest" % "0.4.5-native" % "test"
     ),
     testFrameworks := Seq(new TestFramework("utest.runner.Framework")),
     publishTo := Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
@@ -38,6 +36,14 @@ lazy val fansi = crossProject
   .jsSettings(
     scalaJSUseRhino in Global := false
   )
+  .nativeSettings(
+    name := "fansi-native",
+    nativeClangOptions := Stream(
+      "-I/nix/store/rxvzdlp5x3r60b02fk95v404y3mhs2in-boehm-gc-7.2f-dev/include",
+      "-L/nix/store/bw1p8rairfwv2yif2g1cc0yg8hv25mnl-boehm-gc-7.2f/lib"
+    )
+  )
 
 lazy val fansiJVM = fansi.jvm
 lazy val fansiJS = fansi.js
+lazy val fansiNative = fansi.native
